@@ -1,0 +1,16 @@
+fileURL <- "https://d396qusza40orc.cloudfront.net/exdata%2Fdata%2Fhousehold_power_consumption.zip"
+datafile <- "household_power_consumption.zip"
+download.file(fileURL, datafile, method="curl")
+downloadtime <- date()
+print(downloadtime)
+unzip(datafile, overwrite=TRUE)
+initial <- read.table("household_power_consumption.txt", header=TRUE, sep=";", dec=".", na.strings="?", nrows=100, as.is=TRUE)
+classes <- sapply(initial, class)
+data <- read.table("household_power_consumption.txt", header=TRUE, sep=";", dec=".", na.strings="?", as.is=TRUE, colClasses=classes, comment.char="")
+data2 <- subset(data, Date == "1/2/2007"| Date == "2/2/2007")
+datetime <- as.POSIXct(strptime(paste(data2$Date, data2$Time), format="%d/%m/%Y %T", tz=""))
+data3 <- cbind(datetime, data2[,c(3:9)])
+Sys.setlocale("LC_TIME","C")
+png(filename="plot2.png", width=480, height=480)
+with(data3,plot(datetime,Global_active_power, type="l", ylab="Global Active Power (kilowatts)", xlab=""))
+dev.off()
